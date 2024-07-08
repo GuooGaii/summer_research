@@ -1,56 +1,71 @@
 import glob
 import os
 import re
+from datetime import date
+
+digit_map = {
+    "〇": 0,
+    "一": 1,
+    "二": 2,
+    "三": 3,
+    "四": 4,
+    "五": 5,
+    "六": 6,
+    "七": 7,
+    "八": 8,
+    "九": 9,
+    "十": 10,
+}
 
 
-def number_C2E(ChineseNumber):
-    """中文数字转整形"""
-    map = dict(〇=0, 一=1, 二=2, 三=3, 四=4, 五=5, 六=6, 七=7, 八=8, 九=9, 十=10)
-    size = len(ChineseNumber)
-    if size == 0:
+def chinese_number_to_int(chinese_number: str):
+    """将中文数字转换为整数"""
+    if not chinese_number:
         return 0
-    if size < 2:
-        return map[ChineseNumber]
 
-    ans = 0
-    continue_flag = False  # 连续进两个的标志位
-    for i in range(size):
-        if continue_flag:
-            continue_flag = False
-            continue
+    if chinese_number == "十":
+        return 10
 
-        if i + 1 < size and ChineseNumber[i + 1] == "十":
-            ans += map[ChineseNumber[i]] * 10
-            continue_flag = True
-            continue
-        ans += map[ChineseNumber[i]]
-    return ans
+    if "十" in chinese_number:
+        parts = chinese_number.split("十")
+        if parts[0] == "":
+            parts[0] = "一"
+        if parts[1] == "":
+            parts[1] = "零"
+        return digit_map.get(parts[0], 0) * 10 + digit_map.get(parts[1], 0)
+
+    result = 0
+    for char in chinese_number:
+        result = result * 10 + digit_map.get(char, 0)
+
+    return result
 
 
-def ChineseDate2EnglishDate(ChineseDate):
-    map = dict(〇=0, 一=1, 二=2, 三=3, 四=4, 五=5, 六=6, 七=7, 八=8, 九=9)
-    r = re.search(r"(.*)年(.*)月(.*)日", ChineseDate)
-    year = r.group(1)
-    month = r.group(2)
-    day = r.group(3)
-    for s, n in map.items():
-        year = year.replace(s, str(n))
-    month = number_C2E(month)  # 中文转整型
-    day = number_C2E(day)
+def chinese_date_to_date(chinese_date):
+    """将中文日期字符串转换为date对象"""
+    match = re.search(r"(.*)年(.*)月(.*)日", chinese_date)
+    if not match:
+        print(chinese_date, "日期格式不正确")
+        return None
 
-    # 整型转字符串
-    if month < 10:
-        month = "0" + str(month)
-    else:
-        month = str(month)
-    if day < 10:
-        day = "0" + str(day)
-    else:
-        day = str(day)
-    return year + "-" + month + "-" + day
+    chinese_year, chinese_month, chinese_day = match.groups()
+
+    # 替换中文数字为阿拉伯数字
+    for chinese_digit, arabic_digit in digit_map.items():
+        chinese_year = chinese_year.replace(chinese_digit, str(arabic_digit))
+
+    try:
+        year = int(chinese_year)
+        month = chinese_number_to_int(chinese_month)
+        day = chinese_number_to_int(chinese_day)
+        return date(year, month, day)
+    except (ValueError, TypeError):
+        print(chinese_date, "日期格式不正确")
+        return None
 
 
 def get_all_csv_filepaths(folder_path="./data"):
+    """递归获取某文件夹下所有csv文件的路径"""
     return glob.glob(os.path.join(folder_path, "**", "*.csv"), recursive=True)
 
 
