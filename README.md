@@ -1,5 +1,38 @@
 # 暑期研究
 
+## 使用方法
+
+拉取项目
+
+```shell
+git clone https://github.com/GuooGaii/summer_research.git
+```
+
+进入项目文件夹
+
+```shell
+cd summer_research
+```
+
+创建python虚拟环境
+
+```shell
+python -m venv venv
+```
+
+安装依赖
+
+```shell
+pip install -r requirements.txt
+```
+
+将csv放在文件项目文件夹中的`data`文件夹下，然后在vscode中运行对应任务的`.ipynb`文件即可
+
+## 程序思路
+
+由于原始数据集较大，所以采用分块方式读取处理，在块处理中主要使用pandas和正则表达式处理，块处理是个大循环，处理完一个块会合并到一个pandas数据框中（类似csv），每个文件单独处理，最后合并成一个大pandas数据框。
+数据可视化使用pyecharts
+
 ## 要求
 
 - 每个任务的最终结果分开发
@@ -20,13 +53,3 @@
 ### 任务三
 
 - [ ] 处理打过标签的数据
-
-## 使用方法
-
-拉取项目，在项目文件夹中创建python虚拟环境并安装依赖
-
-```shell
-python -m venv venv && pip install -r requirements.txt
-```
-
-将csv文件放在`data`文件夹下，然后运行对应任务的`.ipynb`文件即可
